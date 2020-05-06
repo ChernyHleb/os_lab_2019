@@ -41,16 +41,25 @@ int main(int argc, char **argv) {
           case 0:
             seed = atoi(optarg);
             // your code here
+            if (seed <= 0) {
+                 printf("seed is a positive number\n");
+                 return 1;
+            }
             // error handling
             break;
           case 1:
             array_size = atoi(optarg);
             // your code here
+            if (array_size <= 0) {
+                printf("array_size is a positive number\n");
+                return 1;
+            }
             // error handling
             break;
           case 2:
             pnum = atoi(optarg);
             // your code here
+            
             // error handling
             break;
           case 3:
@@ -98,7 +107,7 @@ int main(int argc, char **argv) {
       active_child_processes += 1;
       if (child_pid == 0) {
         // child process
-
+        
         // parallel somehow
 
         if (with_files) {
