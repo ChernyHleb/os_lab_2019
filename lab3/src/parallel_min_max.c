@@ -120,8 +120,8 @@ else
 }
 /////////////////////////////////////////////////////
 
-
-  for (int i = 0; i < pnum; i++) {
+int i;
+  for (i = 0; i < pnum; i++) {
       if(!with_files)
       {
           pipeFdPtr[i] = (int*)malloc(sizeof(int)*2);
@@ -138,7 +138,7 @@ else
       active_child_processes += 1;
       if (child_pid == 0) {
         // child process
-        printf("pipe create success");
+        printf("pipe create success\n");
 
         struct MinMax min_max_i;
 // parallel somehow
@@ -188,8 +188,8 @@ else
   struct MinMax min_max;
   min_max.min = INT_MAX;
   min_max.max = INT_MIN;
-
-  for (int i = 0; i < pnum; i++) {
+    
+  for (i = 0; i < pnum; i++) {
     int min = INT_MAX;
     int max = INT_MIN;
 
