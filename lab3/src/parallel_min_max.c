@@ -109,6 +109,7 @@ int threadsAmount = array_size / pnum;
 
 FILE  *myfile;
 int **pipeFdPtr;
+
 if(with_files)
 {
     myfile = fopen("FileForThreads.txt", "w");
@@ -195,7 +196,7 @@ else
     if (with_files) {
       // read from files
         fread(&min, sizeof(int), 1, myfile);
-        fread(&max, sizeof(int), 1, myfile)
+        fread(&max, sizeof(int), 1, myfile);
     } else {
         read(pipeFdPtr[i][0], &min, sizeof(int));
         read(pipeFdPtr[i][0], &max, sizeof(int));
