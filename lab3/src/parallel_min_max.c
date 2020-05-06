@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
             // your code here
             if (seed <= 0) {
                  printf("seed is a positive number\n");
-                 return 1;
+                 seed = -1;
             }
             // error handling
             break;
@@ -52,14 +52,18 @@ int main(int argc, char **argv) {
             // your code here
             if (array_size <= 0) {
                 printf("array_size is a positive number\n");
-                return 1;
+                array_size = -1;
             }
             // error handling
             break;
           case 2:
             pnum = atoi(optarg);
             // your code here
-            
+            if(pnum < 1 || pnum > array_size)
+            {
+                printf("pnum is positive number, less than array size");
+                pnum = -1;
+            }
             // error handling
             break;
           case 3:
@@ -100,19 +104,62 @@ int main(int argc, char **argv) {
   struct timeval start_time;
   gettimeofday(&start_time, NULL);
 
+/////////////////////////////////////////////////////
+int threadsAmount = array_size / pnum;
+
+FILE  *myfile;
+int **pipeFdPtr;
+if(with_files)
+{
+    myfile = fopen("FileForThreads.txt", "w");
+}
+else
+{
+    pipeFdPtr = (int**)malloc(sizeof(int*) * pnum);
+}
+/////////////////////////////////////////////////////
+
+
   for (int i = 0; i < pnum; i++) {
+      if(!with_files)
+      {
+          pipeFdPtr[i] = (int*)malloc(sizeof(int)*2);
+          if(pipe(pipeFdPtr[i]) == -1)
+          {
+              printf("pipe failed");
+              return 1;
+          }
+      }
+
     pid_t child_pid = fork();
     if (child_pid >= 0) {
       // successful fork
       active_child_processes += 1;
       if (child_pid == 0) {
         // child process
-        
-        // parallel somehow
+        printf("pipe create success");
 
+        struct MinMax min_max_i;
+// parallel somehow
+        if(i != pnum - 1)
+        {
+            min_max_i = GetMinMax(array, i*threadsAmount, (i + 1) * threadsAmount);
+        }
+        else
+        {
+            min_max_i = GetMinMax(array, i*threadsAmount, array_size);
+
+        }
+        
         if (with_files) {
+            fwrite(&min_max_i.min, sizeof(int), 1, myfile);
+            fwrite(&min_max_i.max, sizeof(int), 1, myfile);
           // use files here
         } else {
+            write(pipeFdPtr[i][1], &min_max_i.min, sizeof(int));
+            write(pipeFdPtr[i][1], &min_max_i.max, sizeof(int));
+
+            close(pipeFdPtr[i][1]);
           // use pipe here
         }
         return 0;
@@ -124,7 +171,14 @@ int main(int argc, char **argv) {
     }
   }
 
+  if(with_files)
+  {
+      fclose(myfile);
+      myfile = fopen("FileForThreads.txt", "r");
+  }
+
   while (active_child_processes > 0) {
+      wait(NULL);
     // your code here
 
     active_child_processes -= 1;
@@ -140,12 +194,28 @@ int main(int argc, char **argv) {
 
     if (with_files) {
       // read from files
+        fread(&min, sizeof(int), 1, myfile);
+        fread(&max, sizeof(int), 1, myfile)
     } else {
+        read(pipeFdPtr[i][0], &min, sizeof(int));
+        read(pipeFdPtr[i][0], &max, sizeof(int));
+
+        close(pipeFdPtr[i][0]);
+        free(pipeFdPtr[i]);
       // read from pipes
     }
 
     if (min < min_max.min) min_max.min = min;
     if (max > min_max.max) min_max.max = max;
+  }
+/// освобождение данных
+  if(with_files)
+  {
+      fclose(myfile);
+  }
+  else
+  {
+      free(pipeFdPtr);
   }
 
   struct timeval finish_time;
