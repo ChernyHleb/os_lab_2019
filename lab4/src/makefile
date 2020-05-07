@@ -1,6 +1,12 @@
 CC=gcc
 CFLAGS=-I.
-all: parallel_min_max
+all: parallel_min_max makeZombie
+
+makeZombie: makeZombie.o
+	$(CC) -o makeZombie makeZombie.o $(CFLAGS)
+
+makeZombie.o:
+	$(CC) -o makeZombie.o -c makeZombie.c $(CFLAGS)
 
 parallel_min_max : utils.o find_min_max.o utils.h find_min_max.h
 	$(CC) -o parallel_min_max utils.o find_min_max.o parallel_min_max.c $(CFLAGS)
@@ -12,4 +18,4 @@ find_min_max.o : utils.h find_min_max.h
 	$(CC) -o find_min_max.o -c find_min_max.c $(CFLAGS)
 
 clean :
-	rm utils.o find_min_max.o parallel_min_max
+	rm utils.o find_min_max.o parallel_min_max makeZombie makeZombie.o
