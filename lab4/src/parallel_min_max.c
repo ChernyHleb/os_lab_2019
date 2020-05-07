@@ -15,11 +15,26 @@
 #include "find_min_max.h"
 #include "utils.h"
 
+#include <signal.h>
+
+int is_timeout = 0;
+int child_done = 0;
+
+void SetTimeout()
+{
+    is_timeout = 1;
+}
+void SetChildDone()
+{
+    child_done = 1;
+}
+
 int main(int argc, char **argv) {
   int seed = -1;
   int array_size = -1;
   int pnum = -1;
   bool with_files = false;
+  int timeout = -1;
 
   while (true) {
     int current_optind = optind ? optind : 1;
@@ -28,6 +43,7 @@ int main(int argc, char **argv) {
                                       {"array_size", required_argument, 0, 0},
                                       {"pnum", required_argument, 0, 0},
                                       {"by_files", no_argument, 0, 'f'},
+                                      {"timeout", required_argument, 0, 0},
                                       {0, 0, 0, 0}};
 
     int option_index = 0;
@@ -69,6 +85,9 @@ int main(int argc, char **argv) {
           case 3:
             with_files = true;
             break;
+          case 4:
+            timeout = atoi(optarg);
+            break;
 
           defalut:
             printf("Index %d is out of options\n", option_index);
@@ -92,7 +111,7 @@ int main(int argc, char **argv) {
   }
 
   if (seed == -1 || array_size == -1 || pnum == -1) {
-    printf("Usage: %s --seed \"num\" --array_size \"num\" --pnum \"num\" \n",
+    printf("Usage: %s --seed \"num\" --array_size \"num\" --pnum \"num\" --timeout \"num\" \n",
            argv[0]);
     return 1;
   }
@@ -119,7 +138,7 @@ else
     pipeFdPtr = (int**)malloc(sizeof(int*) * pnum);
 }
 /////////////////////////////////////////////////////
-
+pid_t pid;
 int i;
   for (i = 0; i < pnum; i++) {
       if(!with_files)
@@ -132,11 +151,11 @@ int i;
           }
       }
 
-    pid_t child_pid = fork();
-    if (child_pid >= 0) {
+    pid = fork();
+    if (pid >= 0) {
       // successful fork
       active_child_processes += 1;
-      if (child_pid == 0) {
+      if (pid == 0) {
         // child process
         printf("pipe create success\n");
 
@@ -171,7 +190,34 @@ int i;
       return 1;
     }
   }
+///////////////////////////////////////////////////
+    signal(SIGALRM, SetTimeout);
+    signal(SIGCHLD, SetChildDone);
+    alarm(timeout);
+    pause();
 
+    if(is_timeout)
+    {
+        printf("alarm\n");
+        int res = waitpid(pid, NULL, WNOHANG);
+        if(res == 0)
+        {
+            printf("child killed:(\n");
+            kill(pid, 9);
+            wait(NULL);
+        }
+        else
+        {
+            printf("alarm is on, child was killed\n");
+        }
+    }
+    else 
+    if(child_done) 
+    {
+        printf("child kill success >:D\n");
+        wait(NULL);
+    }
+///////////////////////////////////////////////////
   if(with_files)
   {
       fclose(myfile);
