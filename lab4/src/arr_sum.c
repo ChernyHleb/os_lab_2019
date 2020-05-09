@@ -2,7 +2,8 @@
 
 int Sum(const struct SumArgs *args) {
   int sum = 0;
-  for (int i = args->begin; i < args->end; i++)
+  int i;
+  for (i = args->begin; i < args->end; i++)
   {
     sum+=args->array[i];
   } 

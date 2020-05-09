@@ -26,6 +26,7 @@ int main(int argc, char **argv)
   uint32_t threads_num = -1;
   uint32_t array_size = -1;
   uint32_t seed = -1;
+  uint32_t i;
 
   while (1)
   {
@@ -107,7 +108,7 @@ int main(int argc, char **argv)
   gettimeofday(&start_time, NULL);
 
   struct SumArgs args[threads_num];
-  for(uint32_t i = 0; i < threads_num; i++)
+  for(i = 0; i < threads_num; i++)
 	{
 		args[i].array = array;
 		args[i].begin = i*array_size/threads_num;
@@ -120,7 +121,7 @@ int main(int argc, char **argv)
       args[i].end = (i+1)*array_size/threads_num;
     }
 	}
-  for (uint32_t i = 0; i < threads_num; i++)
+  for (i = 0; i < threads_num; i++)
   {
     if (pthread_create(&threads[i], NULL, ThreadSum, (void *)&args[i]))
     {
@@ -130,7 +131,7 @@ int main(int argc, char **argv)
   }
 
   int total_sum = 0;
-  for (uint32_t i = 0; i < threads_num; i++)
+  for (i = 0; i < threads_num; i++)
   {
     int sum = 0;
     pthread_join(threads[i], (void **)&sum);
