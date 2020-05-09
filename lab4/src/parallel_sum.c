@@ -13,7 +13,6 @@
 #include <stdbool.h>
 
 #include "utils.h"
-
 #include "arr_sum.h"
 
 void *ThreadSum(void *args)
