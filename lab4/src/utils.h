@@ -1,6 +1,12 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+struct SumArgs {
+  int *array;
+  int begin;
+  int end;
+};
+
 struct MinMax {
   int min;
   int max;
