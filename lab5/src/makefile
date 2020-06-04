@@ -9,4 +9,4 @@ Parallel_fact : Parallel_fact.c
 	$(CC) -o Parallel_fact Parallel_fact.c -lpthread $(CFLAGS)
 
 clean :
-	mutex Parallel_fact
+	rm mutex Parallel_fact
