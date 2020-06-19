@@ -1,13 +1,16 @@
 CC=gcc
-CFLAGS=-I. -std=c99
+CFLAGS=-I.     -std=gnu99 
 
-all : server client
+all: client server
 
-server : server.c
-	$(CC) -lpthread -o server server.c -L. -lModFact $(CFLAGS)
+MultModulo.o: MultModulo.h
+	$(CC) -o MultModulo.o -c MultModulo.c $(CFLAGS)
 
-client : client.c
-	$(CC) -o client client.c -L. -lModFact $(CFLAGS)
+server : server.c MultModulo.o MultModulo.h
+	$(CC) -o server MultModulo.o server.c -lpthread $(CFLAGS)
 
+client : client.c MultModulo.o MultModulo.h
+	$(CC) -o client MultModulo.o client.c -lpthread $(CFLAGS)
+    
 clean :
-	rm -f client server
+	rm MultModulo.o client server
