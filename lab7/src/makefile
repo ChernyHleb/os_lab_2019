@@ -17,4 +17,3 @@ udpserver: udpserver.c
 
 clean:
 	rm tcpclient tcpserver udpclient udpserver
-© 2020 GitHub, Inc.
